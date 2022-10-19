@@ -6,9 +6,6 @@ edition = "2021"
 
 [dependencies]
 axon-protocol = { git = "https://github.com/axonweb3/axon" }
-ibc = { git = "https://github.com/cosmos/ibc-rs", rev = "8bd8235"}
-
-[patch.crates-io]
-# "Update protos to IBC-Go v5.0.0 and Cosmos SDK v0.46.1"
-# [rev](https://github.com/cosmos/ibc-proto-rs/commit/65c050e3a20e3a1ef3c1247788b5013112e207d7)
-ibc-proto = { git = "https://github.com/cosmos/ibc-proto-rs", rev = "65c050e3a20e3a1ef3c1247788b5013112e207d7" }
+ibc = "0.20"
+ibc-proto = "0.21"
+serde = { version = "1.0", features = ["derive"] }
