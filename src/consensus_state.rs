@@ -11,6 +11,8 @@ use ibc_proto::{google::protobuf::Any, protobuf::Protobuf};
 use serde::{Deserialize, Serialize};
 use tendermint::Time;
 
+use crate::header::Header;
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AxonConsensusState {
     pub timestamp: Time,
@@ -44,6 +46,12 @@ impl TryFrom<Any> for AxonConsensusState {
 
 impl From<AxonConsensusState> for Any {
     fn from(_: AxonConsensusState) -> Self {
+        todo!()
+    }
+}
+
+impl From<Header> for AxonConsensusState {
+    fn from(_: Header) -> Self {
         todo!()
     }
 }

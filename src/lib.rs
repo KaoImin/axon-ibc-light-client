@@ -1,8 +1,9 @@
 mod consensus_state;
+mod header;
 
 use std::time::Duration;
 
-use axon_protocol::types::Header;
+use header::Header;
 use ibc::core::ics02_client::client_state::{ClientState, UpdatedState, UpgradeOptions};
 use ibc::core::ics02_client::client_type::ClientType;
 use ibc::core::ics02_client::consensus_state::ConsensusState;
@@ -74,6 +75,8 @@ impl ClientState for AxonClient {
         client_id: ClientId,
         header: Any,
     ) -> Result<UpdatedState, Ics02Error> {
+        let axon_header = Header::try_from(header)?;
+        let header_consensus_state = AxonConsensusState::from(axon_header.clone());
         todo!()
     }
 
