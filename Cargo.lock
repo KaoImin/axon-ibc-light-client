@@ -116,6 +116,7 @@ dependencies = [
  "ibc",
  "ibc-proto",
  "serde",
+ "tendermint",
 ]
 
 [[package]]

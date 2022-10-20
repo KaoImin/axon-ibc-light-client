@@ -1,3 +1,5 @@
+mod consensus_state;
+
 use std::time::Duration;
 
 use axon_protocol::types::Header;
@@ -21,28 +23,32 @@ use ibc_proto::ibc::core::commitment::v1::MerkleProof;
 use ibc_proto::protobuf::Protobuf;
 use serde::{Deserialize, Serialize};
 
+use crate::consensus_state::AxonConsensusState;
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Client {
+pub struct AxonClient {
     pub chain_id:        ChainId,
     pub latest_height:   Height,
+    pub frozen_height:   Option<Height>,
     pub trusting_period: Duration,
 }
 
-impl ClientState for Client {
+impl ClientState for AxonClient {
     fn chain_id(&self) -> ChainId {
         self.chain_id.clone()
     }
 
     fn client_type(&self) -> ClientType {
-        todo!()
+        // Fix after this issue finish: https://github.com/cosmos/ibc-rs/issues/188
+        ClientType::Tendermint
     }
 
     fn latest_height(&self) -> Height {
-        self.latest_height.clone()
+        self.latest_height
     }
 
     fn frozen_height(&self) -> Option<Height> {
-        None
+        self.frozen_height
     }
 
     fn expired(&self, elapsed: Duration) -> bool {
@@ -59,7 +65,7 @@ impl ClientState for Client {
     }
 
     fn initialise(&self, consensus_state: Any) -> Result<Box<dyn ConsensusState>, Ics02Error> {
-        todo!()
+        AxonConsensusState::try_from(consensus_state).map(AxonConsensusState::into_box)
     }
 
     fn check_header_and_update_state(
@@ -189,9 +195,9 @@ impl ClientState for Client {
     }
 }
 
-impl Protobuf<Any> for Client {}
+impl Protobuf<Any> for AxonClient {}
 
-impl TryFrom<Any> for Client {
+impl TryFrom<Any> for AxonClient {
     type Error = Ics02Error;
 
     fn try_from(value: Any) -> Result<Self, Self::Error> {
@@ -199,8 +205,8 @@ impl TryFrom<Any> for Client {
     }
 }
 
-impl From<Client> for Any {
-    fn from(_: Client) -> Self {
+impl From<AxonClient> for Any {
+    fn from(_: AxonClient) -> Self {
         todo!()
     }
 }
