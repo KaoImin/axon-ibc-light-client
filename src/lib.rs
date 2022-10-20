@@ -1,9 +1,10 @@
 mod consensus_state;
 mod header;
+mod height;
 
 use std::time::Duration;
 
-use header::Header;
+use height::AxonHeight;
 use ibc::core::ics02_client::client_state::{ClientState, UpdatedState, UpgradeOptions};
 use ibc::core::ics02_client::client_type::ClientType;
 use ibc::core::ics02_client::consensus_state::ConsensusState;
@@ -25,6 +26,7 @@ use ibc_proto::protobuf::Protobuf;
 use serde::{Deserialize, Serialize};
 
 use crate::consensus_state::AxonConsensusState;
+use crate::header::Header;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AxonClient {
@@ -76,7 +78,11 @@ impl ClientState for AxonClient {
         header: Any,
     ) -> Result<UpdatedState, Ics02Error> {
         let axon_header = Header::try_from(header)?;
+        let axon_height = AxonHeight::from(axon_header.get_height());
         let header_consensus_state = AxonConsensusState::from(axon_header.clone());
+        let prev_header_hash = axon_header.get_prev_hash();
+        let prev_height = axon_height.prev(1);
+        let prev_consensus_state = ctx.consensus_state(&client_id, prev_height.into())?;
         todo!()
     }
 
