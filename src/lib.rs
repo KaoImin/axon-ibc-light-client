@@ -1,10 +1,11 @@
+mod base;
 mod consensus_state;
 mod header;
-mod height;
+mod verification;
 
 use std::time::Duration;
 
-use height::AxonHeight;
+use base::{AxonHash, AxonHeight};
 use ibc::core::ics02_client::client_state::{ClientState, UpdatedState, UpgradeOptions};
 use ibc::core::ics02_client::client_type::ClientType;
 use ibc::core::ics02_client::consensus_state::ConsensusState;
@@ -27,6 +28,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::consensus_state::AxonConsensusState;
 use crate::header::Header;
+use crate::verification::verify_header;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AxonClient {
@@ -79,11 +81,21 @@ impl ClientState for AxonClient {
     ) -> Result<UpdatedState, Ics02Error> {
         let axon_header = Header::try_from(header)?;
         let axon_height = AxonHeight::from(axon_header.get_height());
-        let header_consensus_state = AxonConsensusState::from(axon_header.clone());
         let prev_header_hash = axon_header.get_prev_hash();
         let prev_height = axon_height.prev(1);
         let prev_consensus_state = ctx.consensus_state(&client_id, prev_height.into())?;
-        todo!()
+        let expect_prev_root = CommitmentRoot::from(AxonHash::from(prev_header_hash));
+        if &expect_prev_root != prev_consensus_state.root() {
+            return Err(Ics02Error::client_specific(
+                "prev hash mismatch".to_string(),
+            ));
+        }
+        verify_header(&axon_header)?;
+        let consensus_state = AxonConsensusState::from(axon_header);
+        Ok(UpdatedState {
+            client_state:    todo!(),
+            consensus_state: consensus_state.into_box(),
+        })
     }
 
     fn verify_upgrade_and_update_state(

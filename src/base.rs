@@ -1,4 +1,5 @@
-use ibc::core::ics02_client::height::Height;
+use axon_protocol::types::MerkleRoot;
+use ibc::core::{ics02_client::height::Height, ics23_commitment::commitment::CommitmentRoot};
 
 #[derive(Debug, Clone, Copy)]
 pub struct AxonHeight(u64);
@@ -26,5 +27,19 @@ impl From<u64> for AxonHeight {
 impl From<AxonHeight> for Height {
     fn from(h: AxonHeight) -> Self {
         Height::new(0, h.0 - 1).unwrap()
+    }
+}
+
+pub struct AxonHash(MerkleRoot);
+
+impl From<MerkleRoot> for AxonHash {
+    fn from(root: MerkleRoot) -> Self {
+        AxonHash(root)
+    }
+}
+
+impl From<AxonHash> for CommitmentRoot {
+    fn from(hash: AxonHash) -> Self {
+        CommitmentRoot::from_bytes(hash.0.as_bytes())
     }
 }

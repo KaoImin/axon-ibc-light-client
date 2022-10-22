@@ -113,8 +113,11 @@ name = "axon-ibc-light-client"
 version = "0.1.0"
 dependencies = [
  "axon-protocol",
+ "common-crypto",
  "ibc",
  "ibc-proto",
+ "overlord",
+ "rlp",
  "serde",
  "tendermint",
 ]
