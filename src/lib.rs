@@ -92,8 +92,10 @@ impl ClientState for AxonClient {
         }
         verify_header(&axon_header)?;
         let consensus_state = AxonConsensusState::from(axon_header);
+        let mut client_state = self.clone();
+        client_state.latest_height = axon_height.into();
         Ok(UpdatedState {
-            client_state:    todo!(),
+            client_state:    client_state.into_box(),
             consensus_state: consensus_state.into_box(),
         })
     }
